@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2016-03-17 Thu 08:08 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="viewport" content="width=device-width, initial-scale=1" />
+<title>Data harvesting and selection by image features</title>
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Asiahub Wolf team" />
+<meta  name="description" content="Data format specification for the customer bulk import tasks"
+ />
+<meta  name="keywords" content="R, data science, emacs, ESS, org-mode, webscraping" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/readtheorg.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="http://www.pirilampo.org/styles/lib/js/jquery.stickytableheaders.js"></script>
+<script type="text/javascript" src="http://www.pirilampo.org/styles/readtheorg/js/readtheorg.js"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Data harvesting and selection by image features</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgheadline10">1. Categories</a>
+<ul>
+<li><a href="#orgheadline9">1.1. Specific categories</a></li>
+</ul>
+</li>
+<li><a href="#orgheadline11">2. Image features</a></li>
+<li><a href="#orgheadline19">3. Instructions</a>
+<ul>
+<li><a href="#orgheadline14">3.1. Environment install</a></li>
+<li><a href="#orgheadline15">3.2. Program install</a></li>
+<li><a href="#orgheadline16">3.3. Load, customization and execution</a></li>
+<li><a href="#orgheadline17">3.4. Data</a></li>
+<li><a href="#orgheadline18">3.5. Questions and issues</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="ABSTRACT">
+<p>
+<b>Confidential</b>.
+</p>
+
+<p>
+In order to overcome in short time period we need human staff <b>Wolf team</b> help
+with SKUs (stock-keeping ​unit) or product selection by image quality.
+</p>
+
+<p>
+Features of images and features are defined and detailed below.
+</p>
+
+</div>
+
+<div id="outline-container-orgheadline10" class="outline-2">
+<h2 id="orgheadline10"><span class="section-number-2">1</span> Categories</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+The categories needed are shown in the image. <b>But we will provide a
+data file with the URL set that will be selected by the team</b>.
+</p>
+
+
+<div class="figure">
+<p><img src="../../graphs/AsiaHub-Categories.png" alt="AsiaHub-Categories.png" />
+</p>
+</div>
+
+<p>
+This is only for your better understanding.
+</p>
+</div>
+
+<div id="outline-container-orgheadline9" class="outline-3">
+<h3 id="orgheadline9"><span class="section-number-3">1.1</span> Specific categories</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+The first release of items include the following categories, we will
+submit the category string in batches to the team. Depending of the
+packages sizes some categories have better percentage selection. This
+selection varies from 10% to 45% roughly.
+</p>
+</div>
+
+<div id="outline-container-orgheadline1" class="outline-4">
+<h4 id="orgheadline1"><span class="section-number-4">1.1.1</span> <span class="todo TODO">TODO</span> 1-HomeAppliences</h4>
+</div>
+
+<div id="outline-container-orgheadline2" class="outline-4">
+<h4 id="orgheadline2"><span class="section-number-4">1.1.2</span> <span class="todo TODO">TODO</span> 2-Baby</h4>
+</div>
+
+<div id="outline-container-orgheadline3" class="outline-4">
+<h4 id="orgheadline3"><span class="section-number-4">1.1.3</span> <span class="todo TODO">TODO</span> 3-Games</h4>
+</div>
+
+<div id="outline-container-orgheadline4" class="outline-4">
+<h4 id="orgheadline4"><span class="section-number-4">1.1.4</span> <span class="todo TODO">TODO</span> 4-BeautyHealth</h4>
+</div>
+
+<div id="outline-container-orgheadline5" class="outline-4">
+<h4 id="orgheadline5"><span class="section-number-4">1.1.5</span> <span class="todo TODO">TODO</span> 5-Drinks</h4>
+</div>
+
+<div id="outline-container-orgheadline6" class="outline-4">
+<h4 id="orgheadline6"><span class="section-number-4">1.1.6</span> <span class="todo TODO">TODO</span> 6-Toys</h4>
+</div>
+
+<div id="outline-container-orgheadline7" class="outline-4">
+<h4 id="orgheadline7"><span class="section-number-4">1.1.7</span> <span class="todo TODO">TODO</span> 7-KitchenSmallAppliences</h4>
+</div>
+
+<div id="outline-container-orgheadline8" class="outline-4">
+<h4 id="orgheadline8"><span class="section-number-4">1.1.8</span> <span class="todo TODO">TODO</span> 8-Sports (Not include because of lack of items)</h4>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline11" class="outline-2">
+<h2 id="orgheadline11"><span class="section-number-2">2</span> Image features</h2>
+<div class="outline-text-2" id="text-2">
+<ul class="org-ul">
+<li>Good quality and resolution</li>
+<li>White background</li>
+<li>Watermarked images are not allowed</li>
+<li>Few people or none is better</li>
+<li>Avoid images with text</li>
+<li>Frames are not allowed</li>
+</ul>
+
+<p>
+For a final product example you can see the image below:
+</p>
+
+
+<div class="figure">
+<p><img src="../../graphs/titleExample.png" alt="titleExample.png" />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline19" class="outline-2">
+<h2 id="orgheadline19"><span class="section-number-2">3</span> Instructions</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-orgheadline14" class="outline-3">
+<h3 id="orgheadline14"><span class="section-number-3">3.1</span> Environment install</h3>
+<div class="outline-text-3" id="text-3-1">
+</div><div id="outline-container-orgheadline12" class="outline-4">
+<h4 id="orgheadline12"><span class="section-number-4">3.1.1</span> Install R</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<p>
+You can obtain from <a href="https://cran.rstudio.com/">CRAN</a>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline13" class="outline-4">
+<h4 id="orgheadline13"><span class="section-number-4">3.1.2</span> Install R Studio</h4>
+<div class="outline-text-4" id="text-3-1-2">
+<p>
+Download and install from <a href="https://www.rstudio.com/products/RStudio">R Studio site</a>.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline15" class="outline-3">
+<h3 id="orgheadline15"><span class="section-number-3">3.2</span> Program install</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+As this program is interpreted by R, we only need to unzip the file
+named "AH.zip" in your Desktop.
+</p>
+
+
+<div class="figure">
+<p><img src="./zip.png" alt="zip.png" />
+</p>
+</div>
+
+<p>
+This zip file contain two directories, you will work in the <code>src</code>
+directory.
+</p>
+
+
+<div class="figure">
+<p><img src="./folderList.png" alt="folderList.png" />
+</p>
+</div>
+
+<p>
+Inside of the <code>src</code> directory will find a <code>dh.R</code> file that is the program.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline16" class="outline-3">
+<h3 id="orgheadline16"><span class="section-number-3">3.3</span> Load, customization and execution</h3>
+<div class="outline-text-3" id="text-3-3">
+<ol class="org-ol">
+<li>Execute RStudio, then go to <code>File &gt; Open file</code> and search for <code>AH &gt;
+   src</code> directory and choose the <code>dh.R</code> file. Click <code>open</code>.</li>
+
+<li>Customize the <code>setwd</code> path according to your computer.</li>
+</ol>
+
+
+<div class="figure">
+<p><img src="./path.png" alt="path.png" />
+</p>
+</div>
+
+<p>
+Comment character in R is the <code>#</code>. Un-comment/Comment and adjust as
+you need.
+</p>
+
+<ol class="org-ol">
+<li>Adjust your variables for the initial SKUs you will select to 1
+initially, recommended batches are 150 SKUs per run, this is
+because the OS limitations for connections available.</li>
+</ol>
+
+
+<div class="figure">
+<p><img src="./initSKU-fileName.png" alt="initSKU-fileName.png" />
+</p>
+</div>
+
+<p>
+The URLSet variable will be part of the file where the current batch
+will be saved when you type <code>q</code> after count 150 values from the
+initial value, in this example where <code>l = 601</code> you will press <code>q</code> when
+you arrive to <code>750</code> SKUs. The you increment both variables.
+</p>
+
+<p>
+The next set will be <code>751</code> and <code>S18</code>. Obviously you will begin from
+<code>1</code> and <code>S1</code>.
+</p>
+
+<ol class="org-ol">
+<li>Please create two accounts in
+<a href="https://login.aliexpress.com/join/buyer/expressJoin.htm">https://login.aliexpress.com/join/buyer/expressJoin.htm</a>, one is for
+the program:</li>
+</ol>
+
+
+<div class="figure">
+<p><img src="./loginPass.png" alt="loginPass.png" />
+</p>
+</div>
+
+<p>
+and the other will be used in the browser when the program call your
+browser to see the images.
+</p>
+
+<ol class="org-ol">
+<li>The next step is setup the <code>browser</code> path</li>
+</ol>
+
+
+<div class="figure">
+<p><img src="./browserPath.png" alt="browserPath.png" />
+</p>
+</div>
+
+<p>
+adjust according to your operating system.
+</p>
+
+<ol class="org-ol">
+<li>Close R Studio</li>
+
+<li>Open your terminal and a finder window. In the finder window search
+for the <code>AH &gt; src</code>, in <code>Terminal</code> write <code>cd</code> and space. Then drag
+and drop your <code>src</code> folder to your <code>Terminal</code> application, the path
+will be copied and press <code>Enter</code>.</li>
+</ol>
+
+
+<div class="figure">
+<p><img src="./ProgramPath.png" alt="ProgramPath.png" />
+</p>
+</div>
+
+<ol class="org-ol">
+<li>Execute R from Terminal, type <code>R</code> and press <code>Enter</code>.</li>
+</ol>
+
+
+<div class="figure">
+<p><img src="./R.png" alt="R.png" />
+</p>
+</div>
+
+<ol class="org-ol">
+<li>Type <code>source('./dh.R')</code> and press <code>Enter</code>. Then follow the
+instructions.</li>
+</ol>
+
+
+<div class="figure">
+<p><img src="./Run.png" alt="Run.png" />
+</p>
+</div>
+
+<ol class="org-ol">
+<li>The program will call to the browser and display the SKU URL.</li>
+</ol>
+
+
+<div class="figure">
+<p><img src="./SKU.png" alt="SKU.png" />
+</p>
+</div>
+
+<ol class="org-ol">
+<li>Selection</li>
+</ol>
+
+<p>
+Now you need to decide to accept, reject or quit. Use <code>y</code> or <code>n</code> to
+accept or reject the image. When you advance 150 SKUs, press <code>q</code> to
+quit and save.
+</p>
+
+
+<div class="figure">
+<p><img src="./Run2.png" alt="Run2.png" />
+</p>
+</div>
+
+
+<div class="figure">
+<p><img src="./Run3.png" alt="Run3.png" />
+</p>
+</div>
+
+<p>
+The last warning is not important now. Save, or write where the next
+batch begin, then adjust the step 3 to the appropriate values with an
+external text editor (RStudio, Sublime or other).
+</p>
+
+<ol class="org-ol">
+<li>Type <code>q()</code> and press <code>Enter</code>, do not need to save workspace, then
+press <code>n</code> and enter.</li>
+</ol>
+
+
+<div class="figure">
+<p><img src="./quit.png" alt="quit.png" />
+</p>
+</div>
+
+<ol class="org-ol">
+<li>Begin again.</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgheadline17" class="outline-3">
+<h3 id="orgheadline17"><span class="section-number-3">3.4</span> Data</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+In the data folder you will see one file generated by run, check each
+run and data until you feel comfortable with the program.
+</p>
+
+<p>
+Given that multiple people will do this task split according to the
+team
+</p>
+
+
+<div class="figure">
+<p><img src="./ParallelHarvest.png" alt="ParallelHarvest.png" />
+</p>
+</div>
+
+<p>
+We will supply a new links file <code>links.RData</code> that you must overwrite
+in the <code>data</code> folder.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline18" class="outline-3">
+<h3 id="orgheadline18"><span class="section-number-3">3.5</span> Questions and issues</h3>
+<div class="outline-text-3" id="text-3-5">
+<p>
+You can contact to me in WeChat any time. Please detail your issue and
+attach some screen-shots to better understanding.
+</p>
+
+<p>
+Thank you!
+Sergio
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 17/03/2016</p>
+<p class="author">Author: Asiahub Wolf team</p>
+<p class="date">Created: 2016-03-17 Thu 08:08</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
